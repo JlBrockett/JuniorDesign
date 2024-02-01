@@ -1,0 +1,170 @@
+// Junior Design Phase 01A Design
+ 
+ #include <math.h>
+
+
+const int blueLED = 10;
+const int greenLED = 9;
+const int redLED = 11;
+
+
+int switchOne = 2;
+int switchTwo = 3;
+int switchThree = 6; // add switch 3
+int switchFour = 5; // add switch 4
+int problemCount = 5; // hardcoded based on the detected problems
+
+
+enum class states { // initializing diferent states of the program
+  ON,
+  OFF,
+  RUN,
+  SLEEP,
+  DIAGNOSTIC
+};
+
+
+void setup() {
+  Serial.begin(9600); // set up communication
+  pinMode(switchOne, INPUT_PULLUP);
+  pinMode(switchTwo, INPUT_PULLUP);
+  pinMode(switchThree, INPUT_PULLUP); // add switch 3
+  pinMode(switchFour, INPUT_PULLUP); // add switch 4
+  pinMode(greenLED, OUTPUT);
+  pinMode(redLED, OUTPUT);
+  pinMode(blueLED, OUTPUT);
+}
+
+
+void loop() {
+  runStates();
+}
+
+
+void runStates() {  // initializing values for onMillis, diagnosticMillis, and sleepMillis
+  static unsigned long onMillis = millis();
+  static unsigned long diagnosticMillis = millis();
+  static unsigned long sleepMillis = millis();
+  // loop continues based on whether the current state of the switch is on
+  static states currState = states::OFF; // set the current state of the state machine to be OFF (to handle toggling)
+
+
+  switch(currState) {
+    // WHEN THE STATE MACHINE IS ON THE OFF STATE
+    // turns off the LEDs (using handleOff()), checks if switchOne is activated (HIGH), and if so, records the current time and transitions the state machine to the ON state.
+    case states::OFF:
+      handleOff(); // turn LEDS off
+      if (digitalRead(switchOne) == HIGH) {
+        Serial.print("Switch 1 pressed, entering ON");
+        onMillis = millis();
+        currState = states::ON;
+      }
+      break;
+   
+    // WHEN THE STATE MACHINE IS ON THE ON STATE
+    // Blinks LED @ 10Hz (via handleOn()), checks if 5 seconds have passed since entering this state,
+    // and if so, transitions the state machine to the DIAGNOSTIC state, recording the time of this transition. (MAY NEED TO BE CHANGED AS SWITCHING TO DIAG. MODE AFTER 5 SECS WAS AN ASSUMPTION)
+    case states::ON:
+      Serial.print("In ON State");
+      handleOn();
+      if (digitalRead(switchThree) == HIGH) {  // Check if switchThree is pressed
+        Serial.print("Switch 3 pressed, entering DIAGNOSTIC");
+        diagnosticMillis = millis();
+        currState = states::DIAGNOSTIC;
+      }
+      break;
+
+
+    // WHEN THE STATE MACHINE IS ON THE DIAGNOSTIC STATE
+    case states::DIAGNOSTIC:
+      handleDiagnostic();
+      if (millis() - diagnosticMillis >= 5000) {
+        currState = states::RUN;
+      }
+      break;
+
+
+    // WHEN THE STATE MACHINE IS ON THE RUN STATE
+    case states::RUN:
+//      handleRun()
+      if (digitalRead(switchTwo) == HIGH) {
+        sleepMillis = millis();
+        currState = states::SLEEP;
+      }
+      break;
+   
+    // WHEN THE STATE MACHINE IS ON THE SLEEP STATE
+    // DONE BUT NEEDS TO BE REVIEWED
+    case states::SLEEP:
+      handleSleep();
+      if (millis() - sleepMillis >= 3000) {
+        currState = states::OFF;
+      }
+      break;
+  }
+}
+
+
+// turn all of the LEDS off
+void handleOff() {
+  digitalWrite(redLED, LOW);
+  digitalWrite(blueLED, LOW);
+  digitalWrite(greenLED, LOW);
+}
+
+
+// makes the red LED blink at a rate of approximately 10 Hz (since 50 milliseconds is half of the 100 milliseconds cycle time for a 10 Hz frequency).
+// Each time the function is called, it checks if 50 milliseconds have passed since the last toggle. If so, it toggles the LED's state and updates the time reference
+void handleOn() {
+  static unsigned long redMillis = millis();
+  if (millis() - redMillis > 50) {
+        digitalWrite(redLED, !digitalRead(redLED));
+        redMillis = millis();
+    }
+}
+
+
+void handleDiagnostic() {
+  // static unsigned long lastBlinkTime = 0;
+  // static int blinkCount = 0;
+  // static bool ledState = LOW;
+  // unsigned long currentMillis = millis();
+
+
+  for (int i = 0; i < problemCount; i++) {
+    digitalWrite(redLED, HIGH);
+    delay(100);
+    digitalWrite(redLED, LOW);
+    delay(100);
+  }
+
+
+}
+
+
+//void handleRun()
+
+
+// NEED TO BE REVIEWED
+// Fading and blinking logic might overlap, causing potentially unintended behavior. Specifically, the Startfade variable is reset every 125 milliseconds
+// during the blinking phase, which could interfere with the intended linear fading.
+// The fadeAmount variable is not used in the current implementation. If intended for adjusting the fade rate, you might need to integrate it into your fading logic.
+// The interaction between blinking and fading needs careful testing to ensure it behaves as expected in the SLEEP state.
+void handleSleep() {
+  static unsigned long blueMillis = millis();
+  static unsigned long Startfade = millis();
+  static int brightness = 255;
+  static int fadeAmount = 5;
+  if ((millis() - blueMillis) > 1000) {
+    //fade
+    brightness = 255 - (255 * (millis() - Startfade)/1000);
+    analogWrite(blueLED, brightness);
+  }
+  else if ((millis() - blueMillis) % 125 == 0) {
+    //blink
+    digitalWrite(blueLED, !digitalRead(blueLED));
+    Startfade = millis();
+  }
+}
+
+
