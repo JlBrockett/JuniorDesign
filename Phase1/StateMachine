@@ -4,12 +4,15 @@ void(* resetFunc) (void) = 0;
 
 const int blueLED = 10;
 const int greenLED = 9;
+const int LED = 9;
 const int redLED = 11;
 const int switchOne = 2;
 const int switchTwo = 3;
 const int switchThree = 6; // add switch 3
 const int switchFour = 5; // add switch 4
 const int buttonOne = 7;
+int potOneVal = 0; // added potentiometer 1 value (pin A1)
+int potTwoVal = 0; // added potentiometer 2 value (pin A2)
 
 
 int problemCount = 5; // hardcoded based on the detected problems
@@ -163,8 +166,12 @@ void handleRun() {
   static unsigned long runMillis = millis();
   static unsigned long blinkMillis = millis();
   static unsigned long diff = millis();
+  static unsigned long potblinkMillis = millis();
   static bool inBlink = false;
   static int count = 4;
+  potOneVal = analogRead(A1); // read the input on analog pin A1
+  potTwoVal = analogRead(A2); // read the input on analog pin A2 for fading Blue LED
+  int potBright = int(potTwoVal / 4.02); 
 
   Serial.println("In RUN State");
   //fade 
@@ -202,6 +209,15 @@ void handleRun() {
       }
     }
   }
+
+  // for blinking for Red LED w/ poteniameter 1
+  if (millis() - potblinkMillis > potOneVal) {
+    digitalWrite(redLED, !digitalRead(redLED));
+    potblinkMillis = millis();
+
+  }
+  
+  analogWrite(blueLED, potBright); // for fading Blue LED w/ poteniameter 2
 
 }
 
