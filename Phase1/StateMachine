@@ -1,18 +1,22 @@
-// Junior Design Phase 01A Design
- 
- #include <math.h>
+#include <math.h>
+void(* resetFunc) (void) = 0;
 
 
 const int blueLED = 10;
 const int greenLED = 9;
 const int redLED = 11;
+const int switchOne = 2;
+const int switchTwo = 3;
+const int switchThree = 6; // add switch 3
+const int switchFour = 5; // add switch 4
+const int buttonOne = 7;
 
 
-int switchOne = 2;
-int switchTwo = 3;
-int switchThree = 6; // add switch 3
-int switchFour = 5; // add switch 4
 int problemCount = 5; // hardcoded based on the detected problems
+
+volatile int ISR_switch = 4;
+volatile bool period = false;
+volatile bool isOn = false;
 
 
 enum class states { // initializing diferent states of the program
@@ -23,6 +27,8 @@ enum class states { // initializing diferent states of the program
   DIAGNOSTIC
 };
 
+volatile states currState = states::OFF; // set the current state of the state machine to be OFF (to handle toggling)
+
 
 void setup() {
   Serial.begin(9600); // set up communication
@@ -30,9 +36,14 @@ void setup() {
   pinMode(switchTwo, INPUT_PULLUP);
   pinMode(switchThree, INPUT_PULLUP); // add switch 3
   pinMode(switchFour, INPUT_PULLUP); // add switch 4
+  pinMode(buttonOne, INPUT_PULLUP);
   pinMode(greenLED, OUTPUT);
   pinMode(redLED, OUTPUT);
   pinMode(blueLED, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(switchOne), switchOneISR, FALLING); // COULD change mode to LOW (test)
+  attachInterrupt(digitalPinToInterrupt(switchTwo), switchTwoISR, RISING);
+  attachInterrupt(digitalPinToInterrupt(switchThree), toOff, FALLING);
+
 }
 
 
@@ -40,13 +51,18 @@ void loop() {
   runStates();
 }
 
+void toOff() {
+  currState = states::OFF;
+  isOn = false;
+}
+
+
 
 void runStates() {  // initializing values for onMillis, diagnosticMillis, and sleepMillis
   static unsigned long onMillis = millis();
   static unsigned long diagnosticMillis = millis();
   static unsigned long sleepMillis = millis();
   // loop continues based on whether the current state of the switch is on
-  static states currState = states::OFF; // set the current state of the state machine to be OFF (to handle toggling)
 
 
   switch(currState) {
@@ -54,8 +70,9 @@ void runStates() {  // initializing values for onMillis, diagnosticMillis, and s
     // turns off the LEDs (using handleOff()), checks if switchOne is activated (HIGH), and if so, records the current time and transitions the state machine to the ON state.
     case states::OFF:
       handleOff(); // turn LEDS off
-      if (digitalRead(switchOne) == HIGH) {
-        Serial.print("Switch 1 pressed, entering ON");
+      if (digitalRead(switchThree) == HIGH and isOn == false) {
+        isOn = true;
+        Serial.println("Switch 1 pressed, entering ON");
         onMillis = millis();
         currState = states::ON;
       }
@@ -64,30 +81,32 @@ void runStates() {  // initializing values for onMillis, diagnosticMillis, and s
     // WHEN THE STATE MACHINE IS ON THE ON STATE
     // Blinks LED @ 10Hz (via handleOn()), checks if 5 seconds have passed since entering this state,
     // and if so, transitions the state machine to the DIAGNOSTIC state, recording the time of this transition. (MAY NEED TO BE CHANGED AS SWITCHING TO DIAG. MODE AFTER 5 SECS WAS AN ASSUMPTION)
-    case states::ON:
-      Serial.print("In ON State");
-      handleOn();
-      if (digitalRead(switchThree) == HIGH) {  // Check if switchThree is pressed
-        Serial.print("Switch 3 pressed, entering DIAGNOSTIC");
-        diagnosticMillis = millis();
-        currState = states::DIAGNOSTIC;
-      }
-      break;
+      case states::ON:
+        Serial.println("In ON State");
+        handleOn();
+      
+        if (digitalRead(buttonOne) == HIGH) {  // Check if button is pressed
+          Serial.println("Switch 3 pressed, entering DIAGNOSTIC");
+          diagnosticMillis = millis();
+          currState = states::DIAGNOSTIC;
+        }
+        break;
 
 
-    // WHEN THE STATE MACHINE IS ON THE DIAGNOSTIC STATE
-    case states::DIAGNOSTIC:
-      handleDiagnostic();
-      if (millis() - diagnosticMillis >= 5000) {
+      // WHEN THE STATE MACHINE IS ON THE DIAGNOSTIC STATE
+      case states::DIAGNOSTIC:
+        Serial.println("In DIAGNOSTIC State");
+        handleDiagnostic();
+        // if (millis() - diagnosticMillis >= 5000) {
         currState = states::RUN;
-      }
+      //}
       break;
 
 
     // WHEN THE STATE MACHINE IS ON THE RUN STATE
     case states::RUN:
-//      handleRun()
-      if (digitalRead(switchTwo) == HIGH) {
+     handleRun();
+      if (digitalRead(switchFour) == HIGH) {
         sleepMillis = millis();
         currState = states::SLEEP;
       }
@@ -96,14 +115,14 @@ void runStates() {  // initializing values for onMillis, diagnosticMillis, and s
     // WHEN THE STATE MACHINE IS ON THE SLEEP STATE
     // DONE BUT NEEDS TO BE REVIEWED
     case states::SLEEP:
-      handleSleep();
+      handleSleep(sleepMillis);
       if (millis() - sleepMillis >= 3000) {
+        // resetFunc(); //added reset here; might not be neccesary
         currState = states::OFF;
       }
       break;
   }
 }
-
 
 // turn all of the LEDS off
 void handleOff() {
@@ -113,8 +132,6 @@ void handleOff() {
 }
 
 
-// makes the red LED blink at a rate of approximately 10 Hz (since 50 milliseconds is half of the 100 milliseconds cycle time for a 10 Hz frequency).
-// Each time the function is called, it checks if 50 milliseconds have passed since the last toggle. If so, it toggles the LED's state and updates the time reference
 void handleOn() {
   static unsigned long redMillis = millis();
   if (millis() - redMillis > 50) {
@@ -123,7 +140,6 @@ void handleOn() {
     }
 }
 
-
 void handleDiagnostic() {
   // static unsigned long lastBlinkTime = 0;
   // static int blinkCount = 0;
@@ -131,7 +147,7 @@ void handleDiagnostic() {
   // unsigned long currentMillis = millis();
 
 
-  for (int i = 0; i < problemCount; i++) {
+  for (int i = 0; i <= problemCount; i++) {
     digitalWrite(redLED, HIGH);
     delay(100);
     digitalWrite(redLED, LOW);
@@ -142,7 +158,52 @@ void handleDiagnostic() {
 }
 
 
-//void handleRun()
+void handleRun() {
+  static unsigned long timeConstant = 6000;
+  static unsigned long runMillis = millis();
+  static unsigned long blinkMillis = millis();
+  static unsigned long diff = millis();
+  static bool inBlink = false;
+  static int count = 4;
+
+  Serial.println("In RUN State");
+  //fade 
+  if (!inBlink) {
+    Serial.println("Fade side");
+    //fade logic
+    diff = millis() - runMillis;
+    if (diff < timeConstant) {
+      Serial.println("Fading");
+      int brightness = 255 - (255 * (diff)/timeConstant);
+      //int brightness = 255 * exp(-diff/timeConstant);
+      Serial.println(brightness);
+      analogWrite(greenLED, brightness);
+    }
+    else {
+      Serial.println("Fade ends");
+      inBlink = true;
+      blinkMillis = millis();
+    }
+  }
+
+  //blink
+  if (inBlink and count > 0) {
+    if (millis() - blinkMillis > 500) {
+      Serial.println("Blink");
+      digitalWrite(greenLED, !digitalRead(greenLED));
+      blinkMillis = millis();
+      count --;
+      if (count == 0) {
+        Serial.println("Blink ends");
+        inBlink = false;
+        runMillis = millis();
+        count = 4;
+        //digitalWrite(greenLED, !digitalRead(greenLED));
+      }
+    }
+  }
+
+}
 
 
 // NEED TO BE REVIEWED
@@ -150,21 +211,38 @@ void handleDiagnostic() {
 // during the blinking phase, which could interfere with the intended linear fading.
 // The fadeAmount variable is not used in the current implementation. If intended for adjusting the fade rate, you might need to integrate it into your fading logic.
 // The interaction between blinking and fading needs careful testing to ensure it behaves as expected in the SLEEP state.
-void handleSleep() {
+
+void handleSleep(long sleep) {
+  //move millis to RUN state to reset on transition.
   static unsigned long blueMillis = millis();
   static unsigned long Startfade = millis();
   static int brightness = 255;
   static int fadeAmount = 5;
+  unsigned long speed = period ? 50 : 125;
+  // unsigned long speed = 125;
+
+  blueMillis = sleep;
+  // Startfade = sleep;
   if ((millis() - blueMillis) > 1000) {
     //fade
     brightness = 255 - (255 * (millis() - Startfade)/1000);
     analogWrite(blueLED, brightness);
   }
-  else if ((millis() - blueMillis) % 125 == 0) {
+  else if ((millis() - blueMillis) % speed == 0) {
     //blink
     digitalWrite(blueLED, !digitalRead(blueLED));
     Startfade = millis();
   }
 }
 
+void switchOneISR() {
+  if (currState == states::RUN) {
+    period = true;
+  }
+}
 
+void switchTwoISR() {
+  if (currState == states::RUN and period == true) {
+    digitalWrite(redLED, HIGH);
+  }
+}
