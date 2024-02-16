@@ -13,26 +13,54 @@ void setup() {
 
 void loop() {
   
-  // Spin motor in one direction
+  static unsigned long controlMillis = millis();
+
+  if (millis() - controlMillis > 0 and millis() - controlMillis < 20000) {
+    directionOne()
+  }
+  else if (millis() - controlMillis > 20000 and millis() - controlMillis < 40000)
+
+}
+
+
+/*
+ * name:      directionOne
+ * purpose:   move the motor
+ * arguments: None
+ * returns:   None (void)
+ * effects: moves the motor forward
+ */
+void directionOne() {
   digitalWrite(motorPin1, HIGH);
   digitalWrite(motorPin2, LOW);
   analogWrite(enablePin1, 127); // Set speed (0 to 255)
   delay(2000); // Run for 2 seconds
-  
-  // Stop motor
-  digitalWrite(motorPin1, LOW);
-  digitalWrite(motorPin2, LOW);
-  delay(1000); // Stop for 1 second
-  
-  // Spin motor in opposite direction
+}
+
+
+/*
+ * name:      directionTwo
+ * purpose:   move the motor
+ * arguments: None
+ * returns:   None (void)
+ * effects: moves the motor backward
+ */
+void directionTwo() {
   digitalWrite(motorPin1, LOW);
   digitalWrite(motorPin2, HIGH);
   analogWrite(enablePin1, 127); // Set speed (0 to 255)
   delay(2000); // Run for 2 seconds
-  
-  // Stop motor
+}
+
+
+/*
+ * name:      stopMotor
+ * purpose:   stop the motor
+ * arguments: None
+ * returns:   None (void)
+ */
+void stopMotor() {
   digitalWrite(motorPin1, LOW);
   digitalWrite(motorPin2, LOW);
   delay(1000); // Stop for 1 second
-
 }
