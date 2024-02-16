@@ -1,3 +1,11 @@
+/*
+motorControl.ino
+Alex, Jane, Selasie, and Supriti
+February 16th, 2024
+
+EE31 Phase 2A
+*/
+
 const int motorPin1 = 3;
 const int motorPin2 = 4;
 const int enablePin1 = 9;
