@@ -6,27 +6,57 @@ February 16th, 2024
 EE31 Phase 2A
 */
 
-const int motorPin1 = 3;
-const int motorPin2 = 4;
-const int enablePin1 = 9;
+//motor one
+const int motorAPin1 = 3;
+const int motorAPin2 = 4;
+const int enableAPin1 = 9;
+
+//motor two
+const int motorBPin1 = 5;
+const int motorBPin2 = 6;
+const int enableBPin1 = 10;
+
+const int onSwitch = 7;
+const int dirButton = 8;
+
+volatile bool dir = true;
 
 
 void setup() {
   
-  pinMode(motorPin1, OUTPUT);
-  pinMode(motorPin2, OUTPUT);
-  pinMode(enablePin1, OUTPUT);
+  pinMode(motorAPin1, OUTPUT);
+  pinMode(motorAPin2, OUTPUT);
+  pinMode(enableAPin1, OUTPUT);
+
+  pinMode(motorBPin1, OUTPUT);
+  pinMode(motorBPin2, OUTPUT);
+  pinMode(enableBPin1, OUTPUT);
+
+  pinMode(onSwitch, INPUT_PULLUP);
+  pinMode(dirButton, INPUT_PULLUP);
+
+  attachInterrupt(digitalPinToInterrupt(onSwitch), stopMotor, FALLING);
+  attachInterrupt(digitalPinToInterrupt(dirButton), changeDirection, FALLING);
 
 }
 
 void loop() {
   
-  static unsigned long controlMillis = millis();
+  // static unsigned long controlMillis = millis();
 
-  if (millis() - controlMillis > 0 and millis() - controlMillis < 20000) {
-    directionOne()
+  // if (millis() - controlMillis > 0 and millis() - controlMillis < 20000) {
+  //   directionOne();
+  // }
+  // else if (millis() - controlMillis > 20000 and millis() - controlMillis < 40000) {
+  //   directionTwo();
+  // }
+
+  if (onSwitch == HIGH and dir == true) {
+    directionOne();
   }
-  else if (millis() - controlMillis > 20000 and millis() - controlMillis < 40000)
+  else if (onSwitch == HIGH and dir == false) {
+    directionTwo();
+  }
 
 }
 
@@ -39,10 +69,13 @@ void loop() {
  * effects: moves the motor forward
  */
 void directionOne() {
-  digitalWrite(motorPin1, HIGH);
-  digitalWrite(motorPin2, LOW);
-  analogWrite(enablePin1, 127); // Set speed (0 to 255)
-  delay(2000); // Run for 2 seconds
+  digitalWrite(motorAPin1, HIGH);
+  digitalWrite(motorAPin2, LOW);
+  analogWrite(enableAPin1, 255); // Set speed (0 to 255)
+
+  digitalWrite(motorBPin1, HIGH);
+  digitalWrite(motorBPin2, LOW);
+  analogWrite(enableBPin1, 255);
 }
 
 
@@ -54,10 +87,13 @@ void directionOne() {
  * effects: moves the motor backward
  */
 void directionTwo() {
-  digitalWrite(motorPin1, LOW);
-  digitalWrite(motorPin2, HIGH);
-  analogWrite(enablePin1, 127); // Set speed (0 to 255)
-  delay(2000); // Run for 2 seconds
+  digitalWrite(motorAPin1, LOW);
+  digitalWrite(motorAPin2, HIGH);
+  analogWrite(enableAPin1, 255); // Set speed (0 to 255)
+
+  digitalWrite(motorBPin1, Low);
+  digitalWrite(motorBPin2, High);
+  analogWrite(enableBPin1, 255);
 }
 
 
@@ -68,7 +104,15 @@ void directionTwo() {
  * returns:   None (void)
  */
 void stopMotor() {
-  digitalWrite(motorPin1, LOW);
-  digitalWrite(motorPin2, LOW);
-  delay(1000); // Stop for 1 second
+  //stop motor A
+  digitalWrite(motorAPin1, LOW);
+  digitalWrite(motorAPin2, LOW);
+
+  //stop motor B
+  digitalWrite(motorBPin1, LOW);
+  digitalWrite(motorBPin2, LOW);
+}
+
+void changeDirection() {
+  dir = !dir;
 }
