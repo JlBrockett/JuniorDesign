@@ -6,6 +6,16 @@ February 16th, 2024
 EE31 Phase 2A
 */
 
+/*
+TODOS:
+1. Turn left- sharp
+2. Turn right- sharp
+3. Turn 180*
+4. Turn arbitary angle
+
+modify speed
+*/
+
 //motor one
 const int motorAPin1 = 3;
 const int motorAPin2 = 4;
@@ -20,6 +30,8 @@ const int onSwitch = 7;
 const int dirButton = 8;
 
 volatile bool dir = true;
+
+int motorSpeed = 255;
 
 
 void setup() {
@@ -45,56 +57,96 @@ void loop() {
   // static unsigned long controlMillis = millis();
 
   // if (millis() - controlMillis > 0 and millis() - controlMillis < 20000) {
-  //   directionOne();
+  //   forwardDirection();
   // }
   // else if (millis() - controlMillis > 20000 and millis() - controlMillis < 40000) {
-  //   directionTwo();
+  //   reverseDirection();
   // }
+  motorSpeed = analogRead(A1);
+  motorSpeed = map(motorSpeed, 0, 1023, 0, 255);
+  if (motorSpeed < 10) motorSpeed = 0;
 
-  if (onSwitch == HIGH and dir == true) {
-    directionOne();
+
+  if (digitalRead(onSwitch) == HIGH and dir == true) {
+    forwardDirection(motorSpeed);
   }
-  else if (onSwitch == HIGH and dir == false) {
-    directionTwo();
+  else if (digitalRead(onSwitch) == HIGH and dir == false) {
+    reverseDirection(motorSpeed);
   }
 
 }
 
 
 /*
- * name:      directionOne
+ * name:      forwardDirection
  * purpose:   move the motor
- * arguments: None
+ * arguments: motor speed
  * returns:   None (void)
  * effects: moves the motor forward
  */
-void directionOne() {
+void forwardDirection(int speed) {
   digitalWrite(motorAPin1, HIGH);
   digitalWrite(motorAPin2, LOW);
-  analogWrite(enableAPin1, 255); // Set speed (0 to 255)
+  analogWrite(enableAPin1, speed); // Set speed (0 to 255)
 
   digitalWrite(motorBPin1, HIGH);
   digitalWrite(motorBPin2, LOW);
-  analogWrite(enableBPin1, 255);
+  analogWrite(enableBPin1, speed);
 }
 
 
 /*
- * name:      directionTwo
+ * name:      reverseDirection
  * purpose:   move the motor
- * arguments: None
+ * arguments: motor speed
  * returns:   None (void)
  * effects: moves the motor backward
  */
-void directionTwo() {
+void reverseDirection(int speed) {
   digitalWrite(motorAPin1, LOW);
   digitalWrite(motorAPin2, HIGH);
-  analogWrite(enableAPin1, 255); // Set speed (0 to 255)
+  analogWrite(enableAPin1, speed); // Set speed (0 to 255)
 
   digitalWrite(motorBPin1, Low);
   digitalWrite(motorBPin2, High);
-  analogWrite(enableBPin1, 255);
+  analogWrite(enableBPin1, speed);
 }
+
+
+// /*
+//  * name:      leftDirection --- more to do
+//  * purpose:   move the motor left
+//  * arguments: None
+//  * returns:   None (void)
+//  * effects: moves the motor forward
+//  */
+// void leftDirection() {
+//   digitalWrite(motorAPin1, HIGH);
+//   digitalWrite(motorAPin2, LOW);
+//   analogWrite(enableAPin1, 255); // Set speed (0 to 255)
+
+//   digitalWrite(motorBPin1, LOW);
+//   digitalWrite(motorBPin2, HIGH);
+//   analogWrite(enableBPin1, 100);
+// }
+
+
+// /*
+//  * name:      rightDirection ---  more to do
+//  * purpose:   move the motor right
+//  * arguments: None
+//  * returns:   None (void)
+//  * effects: moves the motor forward
+//  */
+// void rightDirection() {
+//   digitalWrite(motorAPin1, LOW);
+//   digitalWrite(motorAPin2, HIGH);
+//   analogWrite(enableAPin1, 100); // Set speed (0 to 255)
+
+//   digitalWrite(motorBPin1, HIGH);
+//   digitalWrite(motorBPin2, LOW);
+//   analogWrite(enableBPin1, 255);
+// }
 
 
 /*
@@ -113,6 +165,12 @@ void stopMotor() {
   digitalWrite(motorBPin2, LOW);
 }
 
+/*
+ * name:      changeDirection
+ * purpose:   toggle direction boolean
+ * arguments: None
+ * returns:   None (void)
+ */
 void changeDirection() {
   dir = !dir;
 }
