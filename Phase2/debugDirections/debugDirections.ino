@@ -59,8 +59,8 @@ void loop() {
 
   forwardDirection(motorSpeed);
 
-  turn();
-  stopMotor();
+  // turn();
+  // stopMotor();
 }
 
 
