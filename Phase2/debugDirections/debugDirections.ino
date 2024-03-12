@@ -58,9 +58,43 @@ void loop() {
   if (motorSpeed < 10) motorSpeed = 0;
 
   forwardDirection(motorSpeed);
-
+  delay(1000);
+  reverseDirection(motorSpeed);
+  delay(1000);
   turn();
+  delay(680);
+
   stopMotor();
+  delay(1000);
+
+
+  // turnRight();
+  // delay(350);
+
+  // stopMotor();
+  // delay(1000);
+
+  // turn();
+  // delay(350);
+  // stopMotor();
+  // delay(2000);
+
+  
+  // turnRight();
+  // delay(230);
+  // stopMotor();
+  // delay(1000);
+
+
+
+  // variableSpeeds();
+  // delay(1000);
+  // stopMotor();
+  // delay(1000);
+  // stopOneMotor();
+  // delay(1000);
+  // stopMotor();
+  // delay(2000);
 }
 
 
@@ -72,14 +106,14 @@ void loop() {
  * effects: moves the motor forward
  */
 void forwardDirection(int speed) {
-  digitalWrite(motorAPin1, HIGH);
-  digitalWrite(motorAPin2, LOW);
+  digitalWrite(motorAPin1, LOW);
+  digitalWrite(motorAPin2, HIGH);
   
-  digitalWrite(motorBPin1, LOW);
-  digitalWrite(motorBPin2, HIGH);
+  digitalWrite(motorBPin1, HIGH);
+  digitalWrite(motorBPin2, LOW);
 
-  analogWrite(enableAPin1, 150); // Set speed (0 to 255)
-  analogWrite(enableBPin1, 150);
+  analogWrite(enableAPin1, 130); //left
+  analogWrite(enableBPin1, 210); //right
 }
 
 
@@ -91,14 +125,14 @@ void forwardDirection(int speed) {
  * effects: moves the motor backward
  */
 void reverseDirection(int speed) {
-  digitalWrite(motorAPin1, LOW);
-  digitalWrite(motorAPin2, HIGH);
+  digitalWrite(motorAPin1, HIGH);
+  digitalWrite(motorAPin2, LOW);
 
-  digitalWrite(motorBPin1, HIGH);
-  digitalWrite(motorBPin2, LOW);
+  digitalWrite(motorBPin1, LOW);
+  digitalWrite(motorBPin2, HIGH);
 
-  analogWrite(enableAPin1, 150); // Set speed (0 to 255)
-  analogWrite(enableBPin1, 200);
+  analogWrite(enableAPin1, 130); // Set speed (0 to 255)
+  analogWrite(enableBPin1, 210);
 }
 
 void turn() {
@@ -109,8 +143,36 @@ void turn() {
   digitalWrite(motorBPin1, HIGH);
   digitalWrite(motorBPin2, LOW);
   analogWrite(enableBPin1, 150);
+}
 
-  delay(1280);
+void turnRight() {
+  digitalWrite(motorAPin1, LOW);
+  digitalWrite(motorAPin2, HIGH);
+  analogWrite(enableAPin1, 150); 
+
+  digitalWrite(motorBPin1, LOW);
+  digitalWrite(motorBPin2, HIGH);
+  analogWrite(enableBPin1, 150);
+}
+
+void stopOneMotor() {
+  digitalWrite(motorAPin1, LOW);
+  digitalWrite(motorAPin2, LOW);
+
+  digitalWrite(motorBPin1, LOW);
+  digitalWrite(motorBPin2, HIGH);
+  digitalWrite(enableBPin1, 255);
+}
+
+void variableSpeeds() {
+  digitalWrite(motorAPin1, LOW);
+  digitalWrite(motorAPin2, HIGH);
+  
+  digitalWrite(motorBPin1, HIGH);
+  digitalWrite(motorBPin2, LOW);
+
+  analogWrite(enableAPin1, 255); //left
+  analogWrite(enableBPin1, 130); //right
 }
 
 
