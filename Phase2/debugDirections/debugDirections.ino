@@ -58,6 +58,7 @@ void loop() {
   if (motorSpeed < 10) motorSpeed = 0;
 
   forwardDirection(motorSpeed);
+<<<<<<< HEAD
   delay(1000);
   reverseDirection(motorSpeed);
   delay(1000);
@@ -95,6 +96,11 @@ void loop() {
   // delay(1000);
   // stopMotor();
   // delay(2000);
+=======
+
+  // turn();
+  // stopMotor();
+>>>>>>> 728c26c14ee9b0d6097a81c463acbd2389bbd79a
 }
 
 
