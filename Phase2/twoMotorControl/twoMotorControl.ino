@@ -17,14 +17,14 @@ modify speed
 */
 
 //motor one
-const int motorAPin1 = 3;
-const int motorAPin2 = 4;
-const int enableAPin1 = 9;
+const int motorAPin1 = 9;
+const int motorAPin2 = 10;
+const int enableAPin1 = 11;
 
 //motor two
 const int motorBPin1 = 5;
 const int motorBPin2 = 6;
-const int enableBPin1 = 10;
+const int enableBPin1 = 3;
 
 const int onSwitch = 7;
 const int dirButton = 8;
@@ -67,12 +67,14 @@ void loop() {
   if (motorSpeed < 10) motorSpeed = 0;
 
 
-  if (digitalRead(onSwitch) == HIGH and dir == true) {
+  // if (digitalRead(onSwitch) == HIGH and dir == true) {
     forwardDirection(motorSpeed);
-  }
-  else if (digitalRead(onSwitch) == HIGH and dir == false) {
-    reverseDirection(motorSpeed);
-  }
+  // }
+  // else if (digitalRead(onSwitch) == HIGH and dir == false) {
+  //   reverseDirection(motorSpeed);
+  // }
+
+
 
 }
 
@@ -87,11 +89,12 @@ void loop() {
 void forwardDirection(int speed) {
   digitalWrite(motorAPin1, HIGH);
   digitalWrite(motorAPin2, LOW);
-  analogWrite(enableAPin1, speed); // Set speed (0 to 255)
+  
+  digitalWrite(motorBPin1, LOW);
+  digitalWrite(motorBPin2, HIGH);
 
-  digitalWrite(motorBPin1, HIGH);
-  digitalWrite(motorBPin2, LOW);
-  analogWrite(enableBPin1, speed);
+  analogWrite(enableAPin1, 150); // Set speed (0 to 255)
+  analogWrite(enableBPin1, 150);
 }
 
 
@@ -105,11 +108,24 @@ void forwardDirection(int speed) {
 void reverseDirection(int speed) {
   digitalWrite(motorAPin1, LOW);
   digitalWrite(motorAPin2, HIGH);
-  analogWrite(enableAPin1, speed); // Set speed (0 to 255)
 
-  digitalWrite(motorBPin1, Low);
-  digitalWrite(motorBPin2, High);
-  analogWrite(enableBPin1, speed);
+  digitalWrite(motorBPin1, HIGH);
+  digitalWrite(motorBPin2, LOW);
+
+  analogWrite(enableAPin1, 150); // Set speed (0 to 255)
+  analogWrite(enableBPin1, 200);
+}
+
+void turn() {
+  digitalWrite(motorAPin1, HIGH);
+  digitalWrite(motorAPin2, LOW);
+  analogWrite(enableAPin1, 150); 
+
+  digitalWrite(motorBPin1, HIGH);
+  digitalWrite(motorBPin2, LOW);
+  analogWrite(enableBPin1, 150);
+
+  delay(1280);
 }
 
 
