@@ -2,6 +2,12 @@ const int analogPin = A0;
 const float resistorOne = 2000.0; //Assumed value for R1
 const float resistorTwo = 1000.0; //Assumed value for R2
 
+const float r1min = resistorOne - (resistorOne * 0.05);
+const float r1max = resistorOne + (resistorOne * 0.05);
+
+const float r2min = resistorTwo - (resistorTwo * 0.05);
+const float r2max = resistorTwo + (resistorTwo * 0.05);
+
 
 void setup() {
   Serial.begin(9600);
