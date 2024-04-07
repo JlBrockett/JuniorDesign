@@ -1,0 +1,94 @@
+// whole code is probably too slow for actual use
+
+
+int red = 3;  //pin #s
+int blue = 5;
+
+void setup(){  //setup
+  pinMode(red, OUTPUT);
+  pinMode(blue, OUTPUT);
+  Serial.begin(9600);
+}
+
+
+void loop(){
+  int prev = 0;  //def val storage
+  int curr = 0;
+  int redval = 0;
+  int blueval = 0;
+  int both = 0;
+  int none = 0;
+
+  digitalWrite(red, LOW);  //both off
+  digitalWrite(blue, LOW);
+  for (int i = 0; i <= 5; i++){
+//    curr = Serial.println(analogRead(A5));  //debugging
+    curr = analogRead(A5);
+    if (curr >= prev){
+      prev = curr;
+    }
+    delay(500);
+  }
+  none = prev;  // store val
+
+  curr = 0;  //reset
+  prev = 0;
+  digitalWrite(red, HIGH);  //red on
+  digitalWrite(blue, LOW);
+  for (int i = 0; i <= 5; i++){
+//    curr = Serial.println(analogRead(A5));
+    curr = analogRead(A5);
+    if (curr >= prev){
+      prev = curr;
+    }
+    delay(500);
+  }
+  redval = prev;
+
+
+  curr = 0;
+  prev = 0;
+  digitalWrite(red, LOW);  // blue on
+  digitalWrite(blue, HIGH);
+  for (int i = 0; i <= 5; i++){
+//    curr = Serial.println(analogRead(A5));
+    curr = analogRead(A5);\
+    if (curr >= prev){
+      prev = curr;
+    }
+    delay(500);
+  }
+  blueval = prev;
+
+  curr = 0;
+  prev = 0;
+  digitalWrite(red, HIGH);  // both on
+  digitalWrite(blue, HIGH);
+  for (int i = 0; i <= 5; i++){
+//    curr = Serial.println(analogRead(A5));
+    curr = analogRead(A5);
+    if (curr >= prev){
+      prev = curr;
+    }
+    delay(500);
+  }
+  both = prev;
+
+
+  if(none > redval and none > blueval and none > both){  //testing -- probably most wrong
+    Serial.println("none wins");
+  }
+  else if (redval > none and redval > blueval and redval > both){
+    Serial.println("red wins");
+  }
+  else if (blueval > redval and blueval > none and blueval > both){
+    Serial.println("blue wins");
+  }
+  else if (both > redval and both > blueval and both > none){
+    Serial.println("both wins");
+  }
+  else {
+    Serial.println("???");
+  }  
+  
+}
