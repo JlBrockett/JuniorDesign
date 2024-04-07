@@ -1,0 +1,29 @@
+// the setup routine runs once when you press reset:
+void setup() {
+  // initialize serial communication at 9600 bits per second:
+  Serial.begin(9600);
+}
+
+const int read_Pin = A0;
+const int baseline = 120; //Placeholdervalue
+
+// the loop routine runs over and over again forever:
+void loop() {
+  // read the input on analog pin 0:
+  int sensorValue = analogRead(read_Pin);
+  // print out the value you read:
+
+  //debug
+  Serial.println(sensorValue);
+
+  if(sensorValue < baseline) {
+    //collide();
+  }
+
+  delay(1);  // delay in between reads for stability
+}
+
+/*
+void collide(){
+  //STOP
+}*/
