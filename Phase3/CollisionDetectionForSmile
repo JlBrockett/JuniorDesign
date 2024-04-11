@@ -1,0 +1,36 @@
+//Default values when connected to 5V ~ 1005-1009
+//w/wall @ 12  ~993 +- 3
+//w/hand @ 12 ~998 +- 3
+//w/wall @ 6in 550+- 30 depending on angle
+
+// the setup routine runs once when you press reset:
+const int sensor_Pin = A0;
+
+void setup() {
+  attachInterrupt(digitalPinToInterrupt(sensor_Pin), stopInterrupt(), CHANGE);
+  // initialize serial communication at 9600 bits per second:
+  Serial.begin(9600);
+}
+
+const int baseline = 998; //Placeholdervalue
+
+// the loop routine runs over and over again forever:
+void loop() {
+  // read the input on analog pin 0:
+  int sensorValue = analogRead(sensor_Pin);
+  // print out the value you read:
+
+  //debug
+  Serial.println(sensorValue);
+
+
+  delay(100);  // delay in between reads for stability
+}
+
+
+void stopInterrupt(){
+  if (sensorValue < baseline){
+    Serial.println("STOP");
+  }
+  
+}
