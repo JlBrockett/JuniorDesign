@@ -50,6 +50,7 @@ void loop() {
       break;
     case 3: // Yellow
       Serial.println("Yellow detected");
+      stopMotors();
       break;
   }
   delay(100); // Short delay to prevent erratic behavior
