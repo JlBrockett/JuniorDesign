@@ -15,7 +15,7 @@ void loop() {
   Serial.println(analogRead(sensorPin));
   digitalWrite(redLEDPin, LOW);
 
-  delay(500); // Wait before next reading
+  delay(5000); // Wait before next reading
 
   digitalWrite(blueLEDPin, HIGH);
   delay(100); // Stabilization delay
@@ -25,3 +25,9 @@ void loop() {
 
   delay(500);
 }
+
+//red threshold: 660
+//blue threshold: 370
+
+//Yellow min: 390
+//Yellow max: 690
