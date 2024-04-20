@@ -1,0 +1,44 @@
+//TODO: CALIBRATE
+
+const int RLED = 2;
+const int BLED = 3;
+
+// the setup routine runs once when you press reset:
+void setup() {
+  // initialize serial communication at 9600 bits per second:
+  Serial.begin(9600);
+  pinMode(RLED, OUTPUT);
+  pinMode(BLED, OUTPUT);
+
+}
+
+// the loop routine runs over and over again forever:
+void loop() {
+// Serial.println("1 = 00, 2 = 01, 3 = 10, 4 = 11");
+ int input = Serial.parseInt();
+
+ if (input == 1){
+  digitalWrite(RLED, LOW);
+  digitalWrite(BLED, LOW);
+ }
+ else if (input == 2){
+  digitalWrite(RLED, LOW);
+  digitalWrite(BLED, HIGH);
+ }
+ else if (input == 3){
+  digitalWrite(RLED, HIGH);
+  digitalWrite(BLED, LOW);
+ }
+ else if (input == 4){
+  digitalWrite(RLED, HIGH);
+  digitalWrite(BLED, HIGH);
+ }
+// else {
+//  Serial.println("???");
+// }
+
+  Serial.println(analogRead(A0));
+
+  delay(100);
+ 
+}
