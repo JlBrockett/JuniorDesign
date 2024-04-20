@@ -22,7 +22,7 @@ void loop() {
   }*/
 
   static unsigned long LEDMillis = millis();
-  if (sensorValue < 980){ //daytime
+  if (sensorValue < 985){ //daytime
     if ( millis() - LEDMillis > 100){
       LEDMillis = millis();
       digitalWrite(LED, !digitalRead(LED));
