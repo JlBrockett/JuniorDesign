@@ -35,7 +35,7 @@ void loop() {
   switch(color) {
     case 0: // Black - adjust path
       //adjustPath
-      Serial.println("Black wins");
+      Serial.println("Black detected");
       stopMotors();
       adjustPath();
       break;
@@ -56,34 +56,112 @@ void loop() {
   delay(100); // Short delay to prevent erratic behavior
 }
 
+
 int detectColor() {
   int Reflection;
 
   // Measure reflection from red LED
   digitalWrite(redLEDPin, HIGH);
-//  delay(100); // Short delay to stabilize light reflection
-//  redReflection = analogRead(sensorPin);
-//  digitalWrite(redLEDPin, LOW);
 
   // Measure reflection from blue LED
   digitalWrite(blueLEDPin, HIGH);
-  delay(100); // Short delay to stabilize light reflection
+
+  // Short delay to stabilize light reflection
+  delay(100); 
+
+  //Record and turn LED's off
   Reflection = analogRead(sensorPin);
+  Serial.println(Reflection);
   digitalWrite(blueLEDPin, LOW);
   digitalWrite(redLEDPin, LOW);
 
+
   // Logic to determine color based on the reflection values
-  if (Reflection >= RED_THRESHOLD + range && Reflection <= RED_THRESHOLD - range) {
+  // if (Reflection >= RED_THRESHOLD + range && Reflection <= RED_THRESHOLD - range) {
+  if (Reflection >= RED_THRESHOLD - range && Reflection <= YELLOW_THRESHOLD) {
     return 1; // Red
-  } else if (Reflection >= BLUE_THRESHOLD + range && Reflection <= BLUE_THRESHOLD - range) {
+  } else if (Reflection >= BLUE_THRESHOLD - range && Reflection < RED_THRESHOLD) {
     return 2; // Blue
-  } else if (Reflection >= YELLOW_THRESHOLD + range && Reflection <= YELLOW_THRESHOLD - range) {
+  } else if (Reflection >= YELLOW_THRESHOLD + range || Reflection >= YELLOW_THRESHOLD - range) {
     return 3; // Yellow
   } else {
     return 0; // Black or no color detected
   }
 }
 
+
+
+
+void adjustPath() {
+  // while (!foundPath) {
+  //   turnSlightlyRight();
+  //   if (foundPath) {
+  //     return;
+  //   }
+
+  //   stopMotors();
+  //   turnSlightlyLeft();
+
+  //   turnSlightlyLeft();
+  //   if (foundPath) {
+  //     return;
+  //   }
+
+  //   stopMotors();
+  //   turnSlightlyRight();
+  // }
+
+  turnSlightlyRight();
+  if (foundPath) {
+    return;
+  }
+
+  stopMotors();
+  turnSlightlyLeft();
+
+  turnSlightlyLeft();
+  if (foundPath) {
+    return;
+  }
+
+  stopMotors();
+  turnSlightlyRight();
+  // Wait a bit and check if the path is found
+  // delay(SEARCH_DELAY);
+  
+  // int color = detectColor();
+  // if (color == 2) { // If blue path is found, continue forward
+  //   moveForward();
+  // } else { // If still not found, try turning left more significantly
+  //   turnSlightlyLeft();
+  // }
+}
+
+void turnSlightlyLeft() {
+  static unsigned long turnLeftTime = millis();
+
+  while (millis() - turnLeftTime < 680) {
+    turnLeft();
+    if (detectColor() != 0) {
+      //stop and move forward
+      foundPath = true;
+      break;
+    }
+  }
+}
+
+void turnSlightlyRight() {
+  static unsigned long turnRightTime = millis();
+
+  while (millis() - turnRightTime < 680) {
+    turnRight();
+    if (detectColor() != 0) {
+      //stop and move forward
+      foundPath = true;
+      break;
+    }
+  }
+}
 
 void turnLeft() {
   digitalWrite(motorAPin1, HIGH);
@@ -115,51 +193,3 @@ void stopMotors() {
   digitalWrite(motorBPin2, LOW);
 }
 
-void adjustPath() {
-  while (!foundPath) {
-    turnSlightlyRight();
-    if (foundPath) {
-      return;
-    }
-
-    turnSlightlyLeft();
-
-    turnSlightlyLeft();
-    if (foundPath) {
-      return;
-    }
-    turnSlightlyRight();
-  }
-  // Wait a bit and check if the path is found
-  // delay(SEARCH_DELAY);
-  
-  // int color = detectColor();
-  // if (color == 2) { // If blue path is found, continue forward
-  //   moveForward();
-  // } else { // If still not found, try turning left more significantly
-  //   turnSlightlyLeft();
-  // }
-}
-
-void turnSlightlyLeft() {
-  static unsigned long turnLeftTime = millis();
-
-  while (millis() - turnLeftTime < 680) {
-    turnLeft();
-    if (detectColor() != 0) {
-      foundPath = true;
-      break;
-    }
-  }
-}
-
-void turnSlightlyRight() {
-  static unsigned long turnRightTime = millis();
-
-  while (millis() - turnRightTime < 680) {
-    turnRight();
-    if (detectColor() != 0) {
-      foundPath = true;
-    }
-  }
-}
