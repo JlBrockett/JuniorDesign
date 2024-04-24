@@ -12,32 +12,32 @@ const int motorBPin1 = 5;
 const int motorBPin2 = 6;
 const int enableBPin1 = 3;
 
-
-const int TURN_DELAY = 200; 
-const int SEARCH_DELAY = 1000;
-
-const int RED_THRESHOLD = 730; 
-const int BLUE_THRESHOLD = 670;
-const int YELLOW_THRESHOLD = 870; 
-const int BLACK_THRESHOLD = 540;
+const int RED_THRESHOLD = 860; 
+const int BLUE_THRESHOLD = 800;
+const int YELLOW_THRESHOLD = 900; 
 const int range = 10; // ie threshold +/- range 
 
-bool foundPath = false;
-
 void setup() {
+  pinMode(motorAPin1, OUTPUT);
+  pinMode(motorAPin2, OUTPUT);
+  pinMode(enableAPin1, OUTPUT);
+
+  pinMode(motorBPin1, OUTPUT);
+  pinMode(motorBPin2, OUTPUT);
+  pinMode(enableBPin1, OUTPUT);
+
   pinMode(redLEDPin, OUTPUT);
   pinMode(blueLEDPin, OUTPUT);
   Serial.begin(9600);
 }
 
+
 void loop() {
   int color = detectColor();
   switch(color) {
     case 0: // Black - adjust path
-      //adjustPath
       Serial.println("Black detected");
-      stopMotors();
-      adjustPath();
+      turnLeft();
       break;
     case 1: // Red
       Serial.println("Red detected");
@@ -46,122 +46,46 @@ void loop() {
     case 2: // Blue
       //moveForward
       Serial.println("Blue detected");
-      turnLeft();
+      turnRight();
       break;
     case 3: // Yellow
       Serial.println("Yellow detected");
-      stopMotors();
+      turnRight();
       break;
   }
-  delay(100); // Short delay to prevent erratic behavior
+  delay(250); // Short delay to prevent erratic behavior
 }
-
 
 int detectColor() {
   int Reflection;
 
-  // Measure reflection from red LED
+  // Turn red and blue LED's
   digitalWrite(redLEDPin, HIGH);
-
-  // Measure reflection from blue LED
   digitalWrite(blueLEDPin, HIGH);
 
   // Short delay to stabilize light reflection
-  delay(100); 
+  delay(250);
 
-  //Record and turn LED's off
+  // Measure reflection from red and blue LED's
   Reflection = analogRead(sensorPin);
   Serial.println(Reflection);
+
+  //Turn off red and blue LED's
   digitalWrite(blueLEDPin, LOW);
   digitalWrite(redLEDPin, LOW);
 
-
   // Logic to determine color based on the reflection values
-  // if (Reflection >= RED_THRESHOLD + range && Reflection <= RED_THRESHOLD - range) {
-  if (Reflection >= RED_THRESHOLD - range && Reflection <= YELLOW_THRESHOLD) {
+  if (Reflection >= RED_THRESHOLD + range && Reflection <= RED_THRESHOLD - range) {
     return 1; // Red
-  } else if (Reflection >= BLUE_THRESHOLD - range && Reflection < RED_THRESHOLD) {
+  } else if (Reflection >= BLUE_THRESHOLD + range && Reflection <= BLUE_THRESHOLD - range) {
     return 2; // Blue
-  } else if (Reflection >= YELLOW_THRESHOLD + range || Reflection >= YELLOW_THRESHOLD - range) {
+  } else if (Reflection >= YELLOW_THRESHOLD + range && Reflection <= YELLOW_THRESHOLD - range) {
     return 3; // Yellow
   } else {
     return 0; // Black or no color detected
   }
 }
 
-
-
-
-void adjustPath() {
-  // while (!foundPath) {
-  //   turnSlightlyRight();
-  //   if (foundPath) {
-  //     return;
-  //   }
-
-  //   stopMotors();
-  //   turnSlightlyLeft();
-
-  //   turnSlightlyLeft();
-  //   if (foundPath) {
-  //     return;
-  //   }
-
-  //   stopMotors();
-  //   turnSlightlyRight();
-  // }
-
-  turnSlightlyRight();
-  if (foundPath) {
-    return;
-  }
-
-  stopMotors();
-  turnSlightlyLeft();
-
-  turnSlightlyLeft();
-  if (foundPath) {
-    return;
-  }
-
-  stopMotors();
-  turnSlightlyRight();
-  // Wait a bit and check if the path is found
-  // delay(SEARCH_DELAY);
-  
-  // int color = detectColor();
-  // if (color == 2) { // If blue path is found, continue forward
-  //   moveForward();
-  // } else { // If still not found, try turning left more significantly
-  //   turnSlightlyLeft();
-  // }
-}
-
-void turnSlightlyLeft() {
-  static unsigned long turnLeftTime = millis();
-
-  while (millis() - turnLeftTime < 680) {
-    turnLeft();
-    if (detectColor() != 0) {
-      //stop and move forward
-      foundPath = true;
-      break;
-    }
-  }
-}
-
-void turnSlightlyRight() {
-  static unsigned long turnRightTime = millis();
-
-  while (millis() - turnRightTime < 680) {
-    turnRight();
-    if (detectColor() != 0) {
-      //stop and move forward
-      foundPath = true;
-      break;
-    }
-  }
-}
 
 void turnLeft() {
   digitalWrite(motorAPin1, HIGH);
@@ -171,7 +95,6 @@ void turnLeft() {
   digitalWrite(motorBPin1, HIGH);
   digitalWrite(motorBPin2, LOW);
   analogWrite(enableBPin1, 150);
-  //add delay
 }
 
 void turnRight() {
@@ -182,7 +105,6 @@ void turnRight() {
   digitalWrite(motorBPin1, LOW);
   digitalWrite(motorBPin2, HIGH);
   analogWrite(enableBPin1, 150);
-  //add delay
 }
 
 void stopMotors() {
@@ -192,4 +114,3 @@ void stopMotors() {
   digitalWrite(motorBPin1, LOW);
   digitalWrite(motorBPin2, LOW);
 }
-
