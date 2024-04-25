@@ -57,17 +57,77 @@ void loop() {
   motorSpeed = map(motorSpeed, 0, 1023, 0, 255);
   if (motorSpeed < 10) motorSpeed = 0;
 
+  
+
+
+
+
+
+  //move forward twelve inches
   forwardDirection(motorSpeed);
-<<<<<<< HEAD
+  delay(2000);
+
+  //Stop
+  stopMotor();
+  delay(1000);
+
+  //turn around 180°
+  turn();
+  delay(1040);
+
+  //stop, move backwards three inches
+  stopMotor();
   delay(1000);
   reverseDirection(motorSpeed);
+  delay(800);
+
+  //stop, turn left, turn right, turn right, and turn right to end up as close as possible to the  bot’s starting position.
+  stopMotor();
   delay(1000);
+
   turn();
-  delay(680);
+  delay(520);
 
   stopMotor();
   delay(1000);
 
+  turnRight();
+  delay(520);
+
+  stopMotor();
+  delay(1000);
+
+  turnRight();
+  delay(520);
+
+  stopMotor();
+  delay(1000);
+
+  turnRight();
+  delay(520);
+
+  stopMotor();
+  delay(1000);
+
+  reverseDirection(motorSpeed);
+  delay(2800);
+
+
+
+  stopMotor();
+  delay(10000);
+
+
+
+
+  // reverseDirection(motorSpeed);
+  // delay(1000);
+  // turn();
+  // delay(680);
+
+  // stopMotor();
+  // delay(1000);
+
 
   // turnRight();
   // delay(350);
@@ -77,30 +137,6 @@ void loop() {
 
   // turn();
   // delay(350);
-  // stopMotor();
-  // delay(2000);
-
-  
-  // turnRight();
-  // delay(230);
-  // stopMotor();
-  // delay(1000);
-
-
-
-  // variableSpeeds();
-  // delay(1000);
-  // stopMotor();
-  // delay(1000);
-  // stopOneMotor();
-  // delay(1000);
-  // stopMotor();
-  // delay(2000);
-=======
-
-  // turn();
-  // stopMotor();
->>>>>>> 728c26c14ee9b0d6097a81c463acbd2389bbd79a
 }
 
 
@@ -113,13 +149,13 @@ void loop() {
  */
 void forwardDirection(int speed) {
   digitalWrite(motorAPin1, LOW);
-  digitalWrite(motorAPin2, HIGH);
+  analogWrite(motorAPin2, 100);
   
-  digitalWrite(motorBPin1, HIGH);
+  analogWrite(motorBPin1, 100);
   digitalWrite(motorBPin2, LOW);
 
-  analogWrite(enableAPin1, 130); //left
-  analogWrite(enableBPin1, 210); //right
+  digitalWrite(enableAPin1, HIGH); //right min 130
+  digitalWrite(enableBPin1, HIGH); // left
 }
 
 
@@ -131,34 +167,34 @@ void forwardDirection(int speed) {
  * effects: moves the motor backward
  */
 void reverseDirection(int speed) {
-  digitalWrite(motorAPin1, HIGH);
+  analogWrite(motorAPin1, 100);
   digitalWrite(motorAPin2, LOW);
 
   digitalWrite(motorBPin1, LOW);
-  digitalWrite(motorBPin2, HIGH);
+  analogWrite(motorBPin2, 100);
 
-  analogWrite(enableAPin1, 130); // Set speed (0 to 255)
-  analogWrite(enableBPin1, 210);
+  digitalWrite(enableAPin1, HIGH); // Set speed (0 to 255)
+  digitalWrite(enableBPin1, HIGH);
 }
 
 void turn() {
-  digitalWrite(motorAPin1, HIGH);
+  analogWrite(motorAPin1, 150);
   digitalWrite(motorAPin2, LOW);
-  analogWrite(enableAPin1, 150); 
+  digitalWrite(enableAPin1, HIGH); 
 
-  digitalWrite(motorBPin1, HIGH);
+  analogWrite(motorBPin1, 150);
   digitalWrite(motorBPin2, LOW);
-  analogWrite(enableBPin1, 150);
+  digitalWrite(enableBPin1, HIGH);
 }
 
 void turnRight() {
   digitalWrite(motorAPin1, LOW);
-  digitalWrite(motorAPin2, HIGH);
-  analogWrite(enableAPin1, 150); 
+  analogWrite(motorAPin2, 150);
+  digitalWrite(enableAPin1, HIGH); 
 
   digitalWrite(motorBPin1, LOW);
-  digitalWrite(motorBPin2, HIGH);
-  analogWrite(enableBPin1, 150);
+  analogWrite(motorBPin2, 150);
+  digitalWrite(enableBPin1, HIGH);
 }
 
 void stopOneMotor() {
@@ -180,43 +216,6 @@ void variableSpeeds() {
   analogWrite(enableAPin1, 255); //left
   analogWrite(enableBPin1, 130); //right
 }
-
-
-// /*
-//  * name:      leftDirection --- more to do
-//  * purpose:   move the motor left
-//  * arguments: None
-//  * returns:   None (void)
-//  * effects: moves the motor forward
-//  */
-// void leftDirection() {
-//   digitalWrite(motorAPin1, HIGH);
-//   digitalWrite(motorAPin2, LOW);
-//   analogWrite(enableAPin1, 255); // Set speed (0 to 255)
-
-//   digitalWrite(motorBPin1, LOW);
-//   digitalWrite(motorBPin2, HIGH);
-//   analogWrite(enableBPin1, 100);
-// }
-
-
-// /*
-//  * name:      rightDirection ---  more to do
-//  * purpose:   move the motor right
-//  * arguments: None
-//  * returns:   None (void)
-//  * effects: moves the motor forward
-//  */
-// void rightDirection() {
-//   digitalWrite(motorAPin1, LOW);
-//   digitalWrite(motorAPin2, HIGH);
-//   analogWrite(enableAPin1, 100); // Set speed (0 to 255)
-
-//   digitalWrite(motorBPin1, HIGH);
-//   digitalWrite(motorBPin2, LOW);
-//   analogWrite(enableBPin1, 255);
-// }
-
 
 /*
  * name:      stopMotor
