@@ -101,33 +101,12 @@ void loop() {
   delay(1000);
 
   reverseDirection(motorSpeed);
-  delay(2800);
+  delay(2000);
 
 
 
   stopMotor();
   delay(10000);
-
-
-
-
-  // reverseDirection(motorSpeed);
-  // delay(1000);
-  // turn();
-  // delay(680);
-
-  // stopMotor();
-  // delay(1000);
-
-
-  // turnRight();
-  // delay(350);
-
-  // stopMotor();
-  // delay(1000);
-
-  // turn();
-  // delay(350);
 }
 
 
