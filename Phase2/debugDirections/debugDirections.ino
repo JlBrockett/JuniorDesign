@@ -26,9 +26,6 @@ const int motorBPin1 = 5;
 const int motorBPin2 = 6;
 const int enableBPin1 = 3;
 
-const int onSwitch = 7;
-const int dirButton = 8;
-
 volatile bool dir = true;
 
 int motorSpeed = 255;
@@ -44,18 +41,12 @@ void setup() {
   pinMode(motorBPin2, OUTPUT);
   pinMode(enableBPin1, OUTPUT);
 
-  pinMode(onSwitch, INPUT_PULLUP);
-  pinMode(dirButton, INPUT_PULLUP);
-
-  attachInterrupt(digitalPinToInterrupt(onSwitch), stopMotor, FALLING);
-  attachInterrupt(digitalPinToInterrupt(dirButton), changeDirection, FALLING);
-
 }
 
 void loop() {
-  motorSpeed = analogRead(A1);
-  motorSpeed = map(motorSpeed, 0, 1023, 0, 255);
-  if (motorSpeed < 10) motorSpeed = 0;
+  // motorSpeed = analogRead(A1);
+  // motorSpeed = map(motorSpeed, 0, 1023, 0, 255);
+  // if (motorSpeed < 10) motorSpeed = 0;
 
   
 
@@ -65,7 +56,7 @@ void loop() {
 
   //move forward twelve inches
   forwardDirection(motorSpeed);
-  delay(2000);
+  delay(1600);
 
   //Stop
   stopMotor();
@@ -73,7 +64,7 @@ void loop() {
 
   //turn around 180°
   turn();
-  delay(1040);
+  delay(1160);
 
   //stop, move backwards three inches
   stopMotor();
@@ -86,25 +77,25 @@ void loop() {
   delay(1000);
 
   turn();
-  delay(520);
+  delay(580);
 
   stopMotor();
   delay(1000);
 
   turnRight();
-  delay(520);
+  delay(580);
 
   stopMotor();
   delay(1000);
 
   turnRight();
-  delay(520);
+  delay(580);
 
   stopMotor();
   delay(1000);
 
   turnRight();
-  delay(520);
+  delay(580);
 
   stopMotor();
   delay(1000);
@@ -148,14 +139,14 @@ void loop() {
  * effects: moves the motor forward
  */
 void forwardDirection(int speed) {
-  digitalWrite(motorAPin1, LOW);
-  analogWrite(motorAPin2, 100);
-  
-  analogWrite(motorBPin1, 100);
-  digitalWrite(motorBPin2, LOW);
+  analogWrite(motorAPin1, 150);
+  digitalWrite(motorAPin2, LOW);
 
-  digitalWrite(enableAPin1, HIGH); //right min 130
-  digitalWrite(enableBPin1, HIGH); // left
+  digitalWrite(motorBPin1, LOW);
+  analogWrite(motorBPin2, 150);
+
+  digitalWrite(enableAPin1, HIGH); // Set speed (0 to 255)
+  digitalWrite(enableBPin1, HIGH);
 }
 
 
@@ -167,14 +158,14 @@ void forwardDirection(int speed) {
  * effects: moves the motor backward
  */
 void reverseDirection(int speed) {
-  analogWrite(motorAPin1, 100);
-  digitalWrite(motorAPin2, LOW);
+  digitalWrite(motorAPin1, LOW);
+  analogWrite(motorAPin2, 150);
+  
+  analogWrite(motorBPin1, 150);
+  digitalWrite(motorBPin2, LOW);
 
-  digitalWrite(motorBPin1, LOW);
-  analogWrite(motorBPin2, 100);
-
-  digitalWrite(enableAPin1, HIGH); // Set speed (0 to 255)
-  digitalWrite(enableBPin1, HIGH);
+  digitalWrite(enableAPin1, HIGH); //right min 130
+  digitalWrite(enableBPin1, HIGH); // left
 }
 
 void turn() {
