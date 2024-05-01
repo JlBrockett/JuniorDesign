@@ -1,0 +1,39 @@
+#include <Ultrasonic.h>
+#include <LiquidCrystal_I2C.h>
+#include <Wire.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+Ultrasonic ultrasonic(A5);  // Trigger and echo pin connected to pin 7
+
+void setup() {
+  lcd.init();
+  lcd.backlight();
+  Serial.begin(9600);
+}
+
+void loop() {
+  static unsigned long lastTime = 0;
+  static long lastDistance = 0;
+  float velocity;
+
+  unsigned long currentTime = millis();
+  long currentDistance = ultrasonic.MeasureInCentimeters();
+
+  // Calculate velocity only if a significant time has elapsed (e.g., every 200 milliseconds)
+  if (currentTime - lastTime >= 500) {
+    // Calculate velocity in cm/s
+    velocity = (float)(currentDistance - lastDistance) / (currentTime - lastTime) * 1000.0;
+    
+    lastDistance = currentDistance;
+    lastTime = currentTime;
+  }
+  lcd.setCursor(0,0);
+  lcd.print("Velocity:");
+  lcd.setCursor(0,1);
+  lcd.print(velocity);
+  lcd.setCursor(4, 1);
+  lcd.print(" cm/s");
+
+  delay(100);  // Small delay to avoid too frequent sensor readings
+}
