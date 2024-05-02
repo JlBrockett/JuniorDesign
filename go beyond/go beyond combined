@@ -74,6 +74,9 @@ void loop() {
 
 
   stopMotor();
+  vel();
+  delay(250);
+  vel();
   delay(10000);
   
 
