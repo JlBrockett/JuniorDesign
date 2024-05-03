@@ -12,17 +12,21 @@ EE31 Challenge 5
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-Ultrasonic ultrasonic(A5);  // Trigger and echo pin connected to pin 7
+Ultrasonic ultrasonic(A2);  // Trigger and echo pin connected to pin 7
 
-//motor one
-const int motorAPin1 = 9;
-const int motorAPin2 = 10;
+const int motorAPin1 = 10; //left
+const int motorAPin2 = 9;
 const int enableAPin1 = 11;
 
 //motor two
-const int motorBPin1 = 5;
+const int motorBPin1 = 5; //right
 const int motorBPin2 = 6;
 const int enableBPin1 = 3;
+
+int redLed = A4;
+int yellowLed = 1;
+int blueLed = 0;
+int greenLed = 13;
 
 
 
@@ -47,29 +51,32 @@ void loop() {
   //move forward 25 inches
 
   for (int i = 0; i <= 10; i++) {
-    forwardDirection(150);
+    forwardDirection();
     vel();
     delay(500);
   }
+
+  stopMotor();
+  delay(1000);
 
   for (int i = 0; i <= 10; i++) {
-    forwardDirection(200);
+    fast();
     vel();
     delay(500);
   }
 
-  for (int i = 0; i <= 10; i++) {
-    reverseDirection(150);
-    vel();
-    delay(500);
-  }
+  // for (int i = 0; i <= 10; i++) {
+  //   reverseDirection();
+  //   vel();
+  //   delay(500);
+  // }
 
 
-  for (int i = 0; i <= 10; i++) {
-    reverseDirection(200);
-    vel();
-    delay(500);
-  }
+  // for (int i = 0; i <= 10; i++) {
+  //   reverseDirection();
+  //   vel();
+  //   delay(500);
+  // }
 
 
 
@@ -77,7 +84,7 @@ void loop() {
   vel();
   delay(250);
   vel();
-  delay(10000);
+  delay(5000);
   
 
   
@@ -92,7 +99,7 @@ void vel() {
   float velocity;
 
   unsigned long currentTime = millis();
-  long currentDistance = ultrasonic.MeasureInCentimeters();
+  long currentDistance = ultrasonic.read(); //check this part well. Alex had a different function which was not compiling
 
   // Calculate velocity only if a significant time has elapsed (e.g., every 200 milliseconds)
   if (currentTime - lastTime >= 500) {
@@ -122,28 +129,45 @@ void vel() {
  * returns:   None (void)
  * effects: moves the motor forward
  */
-void forwardDirection(int speed) {
-  analogWrite(motorAPin1, speed);
+void fast() {
+  analogWrite(motorAPin1, 200);
   digitalWrite(motorAPin2, LOW);
 
   digitalWrite(motorBPin1, LOW);
-  analogWrite(motorBPin2, speed);
+  analogWrite(motorBPin2, 200);
+
+  digitalWrite(enableAPin1, HIGH); // Set speed (0 to 255)
+  digitalWrite(enableBPin1, HIGH);
+}
+
+void forwardDirection() {
+  analogWrite(motorAPin1, 150);
+  digitalWrite(motorAPin2, LOW);
+
+  digitalWrite(motorBPin1, LOW);
+  analogWrite(motorBPin2, 150);
 
   digitalWrite(enableAPin1, HIGH); // Set speed (0 to 255)
   digitalWrite(enableBPin1, HIGH);
 }
 
 
-
-void reverseDirection(int speed) {
+/*
+ * name:      reverseDirection
+ * purpose:   move the motor
+ * arguments: motor speed
+ * returns:   None (void)
+ * effects: moves the motor backward
+ */
+void reverseDirection() {
   digitalWrite(motorAPin1, LOW);
-  digitalWrite(motorAPin2, HIGH);
-
-  digitalWrite(motorBPin1, HIGH);
+  analogWrite(motorAPin2, 150);
+  
+  analogWrite(motorBPin1, 150);
   digitalWrite(motorBPin2, LOW);
 
-  analogWrite(enableAPin1, 150); // Set speed (0 to 255)
-  analogWrite(enableBPin1, 200);
+  digitalWrite(enableAPin1, HIGH); //right min 130
+  digitalWrite(enableBPin1, HIGH); // left
 }
 
 
