@@ -49,6 +49,8 @@ void setup() {
 
 void loop() {
   //move forward 25 inches
+  vel();
+  delay(1000);
 
   for (int i = 0; i <= 10; i++) {
     forwardDirection();
@@ -58,6 +60,7 @@ void loop() {
 
   stopMotor();
   delay(1000);
+  vel();
 
   for (int i = 0; i <= 10; i++) {
     fast();
@@ -99,7 +102,7 @@ void vel() {
   float velocity;
 
   unsigned long currentTime = millis();
-  long currentDistance = ultrasonic.read(); //check this part well. Alex had a different function which was not compiling
+  long currentDistance = ultrasonic.read(); //changed from Alex's MeasureIncentimeters()
 
   // Calculate velocity only if a significant time has elapsed (e.g., every 200 milliseconds)
   if (currentTime - lastTime >= 500) {
@@ -140,12 +143,25 @@ void fast() {
   digitalWrite(enableBPin1, HIGH);
 }
 
+
+
+// void reverseDirection(int speed) {
+//   digitalWrite(motorAPin1, LOW);
+//   digitalWrite(motorAPin2, speed);
+
+//   digitalWrite(motorBPin1, speed);
+//   digitalWrite(motorBPin2, LOW);
+
+//   analogWrite(enableAPin1, HIGH); // Set speed (0 to 255)
+//   analogWrite(enableBPin1, HIGH);
+// }
+
 void forwardDirection() {
-  analogWrite(motorAPin1, 150);
+  analogWrite(motorAPin1, 140);
   digitalWrite(motorAPin2, LOW);
 
   digitalWrite(motorBPin1, LOW);
-  analogWrite(motorBPin2, 150);
+  analogWrite(motorBPin2, 140);
 
   digitalWrite(enableAPin1, HIGH); // Set speed (0 to 255)
   digitalWrite(enableBPin1, HIGH);
