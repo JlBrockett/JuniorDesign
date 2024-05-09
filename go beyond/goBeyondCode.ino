@@ -57,55 +57,56 @@ void setup() {
 }
 
 void loop() {
+  float oldVel = 0;
   //move forward 25 inches
-  vel();
+  oldVel = vel(oldVel);
   delay(1000);
 
   for (int i = 0; i <= 10; i++) {
     forwardDirection();
-    vel();
+      oldVel = vel(oldVel);
     delay(100);
   }
 
   stopMotor();
   delay(1000);
-  vel();
+    oldVel = vel(oldVel);
 
   for (int i = 0; i <= 10; i++) {
     fast();
-    vel();
+      oldVel = vel(oldVel);
     delay(100);
   }
 
   // for (int i = 0; i <= 10; i++) {
   //   reverseDirection();
-  //   vel();
+  //     oldVel = vel(oldVel);
   //   delay(500);
   // }
 
 
   // for (int i = 0; i <= 10; i++) {
   //   reverseDirection();
-  //   vel();
+  //     oldVel = vel(oldVel);
   //   delay(500);
   // }
 
 
 
   stopMotor();
-  vel();
+    oldVel = vel(oldVel);
   delay(250);
-  vel();
+    oldVel = vel(oldVel);
   delay(3000); 
 }
 
 
 
 
-void vel() {
+float vel(float oldVel) {
   static unsigned long lastTime = 0;
   static long lastDistance = 0;
-  float velocity = 0.0;
+  float velocity = oldVel;
 
   unsigned long currentTime = millis();
   long currentDistance = ultrasonic.MeasureInCentimeters();
@@ -127,6 +128,7 @@ void vel() {
   lcd.print(" cm/s");
 
   delay(100);
+  return velocity;
 }
 
 
